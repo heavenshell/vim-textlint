@@ -1,0 +1,96 @@
+*ctags_project*	Generate ctags's tag file by each project.
+
+Version: 0.1.1
+Author: Shinya Ohynagi <sohyanagi@gmail.com>
+Repository: http://github.com/heavenshell/vim-ctags-project/
+License: BSD, see LICENSE for more details.
+
+==============================================================================
+CONTENTS					*ctags_project-vim-contents*
+
+Introduction		|ctags_project-vim-introduction|
+Install			|ctags_project-vim-install|
+Tutorial		|ctags_project-vim-tutorial|
+Variables		|ctags_project-vim-variables|
+
+==============================================================================
+INTRODUCTION					*ctags_project-vim-introduction*
+
+|ctags_project| is a generator of ctags_project by each project.
+
+Example.
+  project_a
+     ├ .git
+     ├ views.py
+     └ models.py
+
+  project_b
+     ├ setup.py
+     ├ views.py
+     └ models.py
+
+If you are in `project_a/views.py`. and execute `:CtagsProject`then generate
+tags to ~/.vim/tags/py/project_a/tags
+
+If you are in `project_b/views.py`. and execute `:CtagsProject`then generate
+tags to ~/.vim/tags/py/project_b/tags
+
+Why I reinventing the wheel is followings.
+
+- I want to use |job|
+- I want to generate via Vim
+- I don't want merge all tags
+
+==============================================================================
+INSTALL						*ctags_project-vim-install*
+
+Install the distributed files into Vim runtime directory which is usually
+~/.vim/, or $HOME/vimfiles on Windows.
+
+If you install pathogen that provided from Tim Pope, you should extract the
+file into 'bundle' directory.
+
+==============================================================================
+TUTORIAL					*ctags_project-vim-tutorial*
+
+Generate ctags's tag file by each project.
+
+==============================================================================
+VARIABLES					*ctags_project-vim-variables*
+g:ctags_project_root_files		*g:ctags_project_root_files*
+		Find project root directory.
+		ctags_project.vim search upward recursive directory searches.
+		If you set like ['.git', 'setup.py'],
+		and matches, return current matched directory name.
+
+g:ctags_project_root_filetype		*g:ctags_project_root_filetype*
+		ctags_project.vim use filetype for ctags command like
+		followings.
+>
+		ctags -R --language-force=FILETYPE -f SAVEPATH PROJECT_PATH
+<
+		`Composite` filetype, such as `python.unit`, is invalid
+		parameter. *g:ctags_project_root_filetype* would solved
+		this problem.
+
+g:ctags_project_bin			*g:ctags_project_bin*
+		Path to ctags binary.
+		If you use MacVim Kaoriya, ctags's bin path is
+		`/Applications/MacVim.app/Contents/MacOS/ctags`.
+
+g:ctags_project_save_path		*g:ctags_project_save_path*
+		Path to tag file saved.
+
+		Default value is `~/.vim/tags/${EXT}/${PROJECT_ROOT}`.
+		`${EXT}` is extension of file.
+
+
+==============================================================================
+CHANGELOG					*ctags_project-vim-changelog*
+2016-07-09
+- Tiny fix
+
+2016-06-27
+- First release
+
+vim:tw=78:ts=8:ft=help:norl:noet:fen:fdl=0:
