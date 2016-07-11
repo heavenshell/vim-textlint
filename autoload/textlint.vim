@@ -11,15 +11,11 @@ if exists('g:textlint_loaded')
 endif
 let g:textlint_loaded = 1
 
-if !exists('g:textlint_detect_root')
-  let g:textlint_detect_root = ['node_modules']
-endif
-
 if !exists('g:textlint_configs')
-  let g:textlint_rues = []
+  let g:textlint_configs = []
 endif
 
-" TODO support --rules.
+" TODO Not implemented. Support --rules.
 if !exists('g:textlint_rules')
   let g:textlint_rues = []
 endif
@@ -28,7 +24,7 @@ let s:textlint_config = ''
 
 let s:textlint_complete = ['c']
 
-let s:textlint = ''
+let s:textlint = {}
 
 function! s:detect_textlint_bin(srcpath) abort
   if executable('textlint') == 0
@@ -44,7 +40,11 @@ function! s:build_config(srcpath) abort
   if s:textlint_config == '' && len(g:textlint_configs) > 0
     let s:textlint_config = g:textlint_configs[0]
   endif
-  let config_path = printf(' --config=%s/%s -f compact ', root_path, s:textlint_config)
+  if s:textlint_config == ''
+    let config_path = printf(' -f compact ')
+  else
+    let config_path = printf(' --config=%s/%s -f compact ', root_path, s:textlint_config)
+  endif
   return config_path
 endfunction
 
@@ -79,11 +79,24 @@ function! textlint#complete(lead, cmd, pos) abort
   return filter(g:textlint_configs, filter_cmd)
 endfunction
 
+" Detect textlint bin and config file.
+function! textlint#init() abort
+  let textlint = s:detect_textlint_bin(expand('%:p'))
+  let config = s:build_config(expand('%:p'))
+
+  let s:textlint['bin'] = textlint
+  let s:textlint['config'] = config
+
+  return s:textlint
+endfunction
+
 " Setup textlint settings.
 function! textlint#setup(...)
   call s:parse_options(a:000[0])
-  let textlint = s:detect_textlint_bin(expand('%:p'))
-  let config = s:build_config(expand('%:p'))
+  let ret = textlint#init()
+  let textlint = ret['bin']
+  let config = ret['config']
+
   let textlink = s:build_textlink(textlint, config, expand('%:p'))
   let cmd = substitute(textlink, '\s', '\\ ', 'g')
   "let &makeprg did not work properly.
