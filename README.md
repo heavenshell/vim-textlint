@@ -5,6 +5,15 @@ Currently WIP.
 
 Wrapper for [textlint](https://textlint.github.io/).
 
+Motivations
+-----------
+I want to load `textlint` config file dynamically.
+
+[Syntastic](https://github.com/scrooloose/syntastic) can use `textlint` but not support config file.
+
+[watchdocs.vim](https://github.com/osyo-manga/vim-watchdogs) also has `textlint` settings but not supporting config file.
+
+
 Configure
 ---------
 

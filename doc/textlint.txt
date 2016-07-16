@@ -1,6 +1,6 @@
 *textlint*	Wrapper for textlint.
 
-Version: 0.1.1
+Version: 0.2.0
 Author: Shinya Ohynagi <sohyanagi@gmail.com>
 Repository: http://github.com/heavenshell/vim-textlint/
 License: BSD, see LICENSE for more details.
