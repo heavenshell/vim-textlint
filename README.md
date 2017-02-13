@@ -48,7 +48,7 @@ After run `:Textlint` textlint.vim would show errors if error exists.
 - Show QuickFix error in statusline, and highlight QuickFix errors run
   quickfixstatus.vim and vim-hier.
 
-``viml
+```viml
   function! s:textlint_after(...)
     execute ':QuickfixStatusEnable'
     execute ':HierUpdate'
