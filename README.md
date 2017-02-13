@@ -27,11 +27,13 @@ let g:textlint_configs = [
 
 ```viml
 :Textlint
+:cwindow
 ```
 If you did not set any args, `vim-textlint` would use `g:textlint_configs`'s first value.
 
 ```viml
 :Textlint -c @example/textlint-config-example
+:cwindow
 ```
 You can select `textlint` config file via command line.
 
