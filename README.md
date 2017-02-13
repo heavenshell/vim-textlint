@@ -62,5 +62,5 @@ After run `:Textlint` textlint.vim would show errors if error exists.
   autocmd BufWritePost *.md call textlint#run()
   autocmd InsertLeave *.md call textlint#run()
   " TextChanged triggered very often, turn off if Vim is slow.
-  autocmd TextChanged,TextChangedI *.py call textlint#run()
+  autocmd TextChanged,TextChangedI *.md call textlint#run()
 ```
