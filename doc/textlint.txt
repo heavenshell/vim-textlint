@@ -1,6 +1,6 @@
 *textlint*	Wrapper for textlint.
 
-Version: 0.2.0
+Version: 1.0.0
 Author: Shinya Ohynagi <sohyanagi@gmail.com>
 Repository: http://github.com/heavenshell/vim-textlint/
 License: BSD, see LICENSE for more details.
@@ -55,35 +55,31 @@ Usage:
 If you did not set any args, vim-textlint would use g:textlint_configs's first value.
 >
   :Textlint -c @example/textlint-config-example
+
+After run `:Textlint` textlint.vim would show errors if error exists.
+
+- Show QuickFix error in statusline, and highlight QuickFix errors run
+  quickfixstatus.vim and vim-hier.
+>
+  function! s:textlint_after(...)
+    execute ':QuickfixStatusEnable'
+    execute ':HierUpdate'
+  endfunction
+
+  let g:textlint_callbacks = {
+    \ 'after_run': function('s:texltint_after')
+    \ }
+  autocmd BufWritePost *.md call textlint#run()
+  autocmd InsertLeave *.md call textlint#run()
+  autocmd TextChanged,TextChangedI *.py call textlint#run()
 >
 You can select textlint config file via command line.
 >
-  :silent make|redraw|copen
->
-Execute textlint via :make.
-
-
 Helpful plugins
 `QuickFixstatus` shows error message at the bottom of the screen.
 
 `Hier` will highlight quickfix errors and location list entries in buffer.
 
-Integration:
-
-vim-textlint can integrate with watchdocs.vim.
-
-Configure followings to your .vimrc.
->
-  " Enable vim-textlint config
-  let g:quickrun_config['markdown/watchdogs_checker'] = {
-    \ 'type': 'watchdogs_checker/textlint',
-    \ 'hook/watchdogs_quickrun_running_textlint/enable': 1,
-    \ }
->
-Run watchdocs.vim.
->
-  :WatchdogsRun
->
 ==============================================================================
 VARIABLES					*textlint-vim-variables*
 g:textlint_configs				*g:textlint_configs*
@@ -92,8 +88,30 @@ g:textlint_configs				*g:textlint_configs*
 
 		Default value is [].
 
+
+g:textlint_enable_quickfix			*g:textlint_enable_quickfix*
+		Enable to open QuickFix window automatically.
+
+		Default value is 0(Do not open automatically)
+
+
+g:textlint_callbacks				*g:textlint_callbacks*
+		Hook points. User can inject various functions to snowflke.
+
+		before_run	Inject to textlint#run() before called
+		after_run 	Inject to textlint#run() after called
+
+g:textlint_clear_quickfix			*g:textlint_clear_quickfix*
+		Clear QuickFix every time befor run.
+
+		Default value is 1(Clear QuickFix)
+
 ==============================================================================
 CHANGELOG					*textlint-vim-changelog*
+2017-02-14
+- Run :Textlint with job and channel
+- Remove watchdocs.vim integrate
+
 2016-07-11
 - Add watchdocs.vim support.
 

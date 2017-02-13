@@ -1,12 +1,9 @@
-vim-textlint
-============
-
-Currently WIP.
+# vim-textlint
 
 Wrapper for [textlint](https://textlint.github.io/).
 
-Motivations
------------
+## Motivations
+
 I want to load `textlint` config file dynamically.
 
 [Syntastic](https://github.com/scrooloose/syntastic) can use `textlint` but not support config file.
@@ -14,8 +11,7 @@ I want to load `textlint` config file dynamically.
 [watchdocs.vim](https://github.com/osyo-manga/vim-watchdogs) also has `textlint` settings but not supporting config file.
 
 
-Configure
----------
+## Configure
 
 Add `textlint` config file name to your `.vimrc`.
 ```viml
@@ -27,8 +23,7 @@ let g:textlint_configs = [
 " }}}
 ```
 
-Usage
------
+## Usage
 
 ```viml
 :Textlint
@@ -40,34 +35,29 @@ If you did not set any args, `vim-textlint` would use `g:textlint_configs`'s fir
 ```
 You can select `textlint` config file via command line.
 
-```viml
-:silent make|redraw|copen
-```
-Execute `textlint` via `:make`.
-
-Helpful plugins
----------------
+## Helpful plugins
 
 [QuickFixstatus](https://github.com/dannyob/quickfixstatus) shows error message at the bottom of the screen.
 
 [Hier](https://github.com/cohama/vim-hier) will highlight `quickfix` errors and location list entries in buffer.
 
-Integration
-------------
+## Sample settings
 
-`vim-textlint` can integrate with [watchdocs.vim](https://github.com/osyo-manga/vim-watchdogs).
+After run `:Textlint` textlint.vim would show errors if error exists.
 
-Configure followings to your `.vimrc`.
-```viml
-" Enable vim-textlint config
-let g:quickrun_config['markdown/watchdogs_checker'] = {
-  \ 'type': 'watchdogs_checker/textlint',
-  \ 'hook/watchdogs_quickrun_running_textlint/enable': 1,
-  \ }
-```
+- Show QuickFix error in statusline, and highlight QuickFix errors run
+  quickfixstatus.vim and vim-hier.
 
-Run `watchdocs.vim`.
+``viml
+  function! s:textlint_after(...)
+    execute ':QuickfixStatusEnable'
+    execute ':HierUpdate'
+  endfunction
 
-```viml
-:WatchdogsRun
+  let g:textlint_callbacks = {
+    \ 'after_run': function('s:texltint_after')
+    \ }
+  autocmd BufWritePost *.md call textlint#run()
+  autocmd InsertLeave *.md call textlint#run()
+  autocmd TextChanged,TextChangedI *.py call textlint#run()
 ```
