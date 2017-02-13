@@ -51,10 +51,12 @@ Add textlint config file name to your .vimrc.
 Usage:
 >
   :Textlint
+  :cwindow
 >
 If you did not set any args, vim-textlint would use g:textlint_configs's first value.
 >
   :Textlint -c @example/textlint-config-example
+  :cwindow
 
 After run `:Textlint` textlint.vim would show errors if error exists.
 
@@ -71,7 +73,7 @@ After run `:Textlint` textlint.vim would show errors if error exists.
     \ }
   autocmd BufWritePost *.md call textlint#run()
   autocmd InsertLeave *.md call textlint#run()
-  autocmd TextChanged,TextChangedI *.py call textlint#run()
+  autocmd TextChanged,TextChangedI *.md call textlint#run()
 >
 You can select textlint config file via command line.
 >
