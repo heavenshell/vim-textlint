@@ -1,6 +1,6 @@
 " File: textlint.vim
 " Author: Shinya Ohyanagi <sohyanagi@gmail.com>
-" Version: 1.0.0
+" Version: 1.0.1
 " WebPage: http://github.com/heavenshell/vim-textlint.
 " Description: Vim plugin for TextLint
 " License: BSD, see LICENSE for more details.
@@ -88,21 +88,25 @@ function! s:parse(msg)
 endfunction
 
 function! s:callback(ch, msg)
-  let results = json_decode(a:msg)
-  let outputs = s:parse(results)
-  if len(outputs) == 0
-    " No Errors. Clear quickfix then close window if exists.
-    call setqflist([], 'r')
-    cclose
-    return
-  endif
+  try
+    let results = json_decode(a:msg)
+    let outputs = s:parse(results)
+    if len(outputs) == 0
+      " No Errors. Clear quickfix then close window if exists.
+      call setqflist([], 'r')
+      cclose
+      return
+    endif
 
-  " Create quickfix via setqflist().
-  let mode = g:textlint_clear_quickfix == 1 ? 'r' : 'a'
-  call setqflist(outputs, mode)
-  if len(outputs) && g:textlint_enable_quickfix == 1
-    cwindow
-  endif
+    " Create quickfix via setqflist().
+    let mode = g:textlint_clear_quickfix == 1 ? 'r' : 'a'
+    call setqflist(outputs, mode)
+    if len(outputs) && g:textlint_enable_quickfix == 1
+      cwindow
+    endif
+  catch
+    echohl Error | echomsg a:msg
+  endtry
 endfunction
 
 function! s:exit_callback(ch, msg)
@@ -113,7 +117,7 @@ function! s:exit_callback(ch, msg)
 endfunction
 
 " Build textlint cmmand {name,value} complete.
-function! textlint#complete(lead, cmd, pos) abort
+function! textlint#complete(lead, cmd, pos)
   let cmd = split(a:cmd)
   let size = len(cmd)
   if size <= 1
@@ -165,7 +169,7 @@ function! textlint#run(...)
   let config = s:textlint['config']
 
   let file = expand('%:p')
-  let cmd = s:build_textlink(textlint, config, expand('%:p'))
+  let cmd = s:build_textlink(textlint, config)
   let s:job = job_start(cmd, {
         \ 'callback': {c, m -> s:callback(c, m)},
         \ 'exit_cb': {c, m -> s:exit_callback(c, m)},
