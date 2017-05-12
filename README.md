@@ -57,7 +57,7 @@ After run `:Textlint` textlint.vim would show errors if error exists.
   endfunction
 
   let g:textlint_callbacks = {
-    \ 'after_run': function('s:texltint_after')
+    \ 'after_run': function('s:textlint_after')
     \ }
   autocmd BufWritePost *.md call textlint#run()
   autocmd InsertLeave *.md call textlint#run()

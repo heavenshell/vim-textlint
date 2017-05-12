@@ -1,6 +1,6 @@
 " File: textlint.vim
 " Author: Shinya Ohyanagi <sohyanagi@gmail.com>
-" Version: 1.0.0
+" Version: 1.0.1
 " WebPage: http://github.com/heavenshell/vim-textlint.
 " Description: Vim plugin for TextLint
 " License: BSD, see LICENSE for more details.
