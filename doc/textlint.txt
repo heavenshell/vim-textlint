@@ -1,6 +1,6 @@
 *textlint*	Wrapper for textlint.
 
-Version: 1.0.1
+Version: 1.0.2
 Author: Shinya Ohynagi <sohyanagi@gmail.com>
 Repository: http://github.com/heavenshell/vim-textlint/
 License: BSD, see LICENSE for more details.
@@ -110,6 +110,9 @@ g:textlint_clear_quickfix			*g:textlint_clear_quickfix*
 
 ==============================================================================
 CHANGELOG					*textlint-vim-changelog*
+2017-05-14
+- Fix bug
+
 2017-05-12
 - Fix textlint returns error
 

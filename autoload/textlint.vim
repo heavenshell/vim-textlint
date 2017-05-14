@@ -54,7 +54,7 @@ function! s:build_config(srcpath)
 endfunction
 
 " Build textlint bin path.
-function! s:build_textlink(binpath, configpath, target)
+function! s:build_textlink(binpath, configpath)
   let cmd = a:binpath . a:configpath . '%'
   return cmd
 endfunction
