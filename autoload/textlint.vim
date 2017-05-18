@@ -1,6 +1,6 @@
 " File: textlint.vim
 " Author: Shinya Ohyanagi <sohyanagi@gmail.com>
-" Version: 1.0.1
+" Version: 1.1.0
 " WebPage: http://github.com/heavenshell/vim-textlint.
 " Description: Vim plugin for TextLint
 " License: BSD, see LICENSE for more details.
@@ -29,7 +29,8 @@ function! s:detect_textlint_bin(srcpath)
     if root_path == ''
       return ''
     endif
-    let textlint = root_path . '/.bin/textlint'
+    let root_path = fnamemodify(root_path, ':p')
+    let textlint = exepath(root_path . '.bin/textlint')
   else
     let textlint = exepath('textlint')
   endif
@@ -47,7 +48,7 @@ function! s:build_config(srcpath)
   if s:textlint_config == ''
     let config_path = printf(' --stdin --stdin-filename %s --format json ', file)
   else
-    let config_path = printf(' --config=%s/%s --stdin --stdin-filename %s --format json ', root_path, s:textlint_config, file)
+    let config_path = printf(' --config=%s%s --stdin --stdin-filename %s --format json ', root_path, s:textlint_config, file)
   endif
 
   return config_path
@@ -105,7 +106,7 @@ function! s:callback(ch, msg)
       cwindow
     endif
   catch
-    echohl Error | echomsg a:msg
+    echohl Error | echomsg a:msg | echohl None
   endtry
 endfunction
 
@@ -159,7 +160,7 @@ function! textlint#run(...)
 
   call s:parse_options(args)
 
-  if s:textlint == {}
+  if s:textlint == {} || args != ''
     call textlint#init()
   endif
   let textlint = s:textlint['bin']
