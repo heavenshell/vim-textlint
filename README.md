@@ -1,5 +1,7 @@
 # vim-textlint
 
+[![Build Status](https://travis-ci.org/heavenshell/vim-textlint.svg?branch=master)](https://travis-ci.org/heavenshell/vim-textlint)
+
 Wrapper for [textlint](https://textlint.github.io/).
 
 ## Motivations
