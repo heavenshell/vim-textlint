@@ -2,3 +2,5 @@
 *~
 .DS_Store
 tags
+tests/vader.vim/
+tests/node_modules/

@@ -1,0 +1,17 @@
+{
+  "name": "vim-textlint",
+  "version": "1.0.0",
+  "description": "TextLint for Vim",
+  "main": "n/a",
+  "scripts": {
+    "lint": "textlint ."
+  },
+  "private": true,
+  "author": "Shinya Ohyanagi",
+  "license": "MIT",
+  "devDependencies": {
+    "@azu/textlint-config-readme": "^1.0.2",
+    "textlint": "^8.0.1"
+  },
+  "dependencies": {}
+}

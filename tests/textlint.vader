@@ -1,0 +1,21 @@
+# vim:set et sw=4 ts=4 tw=79:
+Execute (Setup config):
+  Save g:textlint_configs
+  let g:textlint_configs = ['@azu/textlint-config-readme']
+
+Execute ('Run Textlint'):
+  edit ./README.md
+  :Textlint
+  sleep 2
+
+  let qf = getqflist()
+  AssertEqual len(qf), 4
+
+Execute ('Run Textlint -c'):
+  let g:textlint_configs = ['foo', '@azu/textlint-config-readme']
+  edit ./README.md
+  :Textlint -c @azu/textlint-config-readme
+  sleep 2
+
+  let qf = getqflist()
+  AssertEqual len(qf), 4
