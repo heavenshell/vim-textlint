@@ -4,6 +4,8 @@
 
 Wrapper for [textlint](https://textlint.github.io/).
 
+![Asynchronous textlint](./assets/vim-textlint.gif)
+
 ## Motivations
 
 I want to load `textlint` config file dynamically.
