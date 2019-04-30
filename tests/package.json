@@ -11,7 +11,8 @@
   "license": "MIT",
   "devDependencies": {
     "@azu/textlint-config-readme": "^1.0.2",
-    "textlint": "^8.0.1"
+    "textlint": "^8.0.1",
+    "textlint-rule-common-misspellings": "^1.0.1"
   },
   "dependencies": {}
 }

@@ -33,13 +33,17 @@ let g:textlint_configs = [
 :Textlint
 :cwindow
 ```
-If you did not set any args, `vim-textlint` would use `g:textlint_configs`'s first value.
+If you did not set any args, `vim-textlint` would use `g:textlint_configs`'s first value or `textlintrc`.
 
 ```viml
 :Textlint -c @example/textlint-config-example
 :cwindow
 ```
 You can select `textlint` config file via command line.
+
+## Autofix
+
+If rules are fixable, you can autofix with `TextintFix`.
 
 ## Helpful plugins
 
