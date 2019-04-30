@@ -1,0 +1,11 @@
+# vim:set et sw=4 ts=4 tw=79:
+Execute ('Run TextlintFix'):
+  call system('cp ./_fixture.md ./fixture.md')
+
+Execute ('Run TextlintFix'):
+  edit ./fixture.md
+  :TextlintFix
+  sleep 2
+
+  let qf = getqflist()
+  AssertEqual len(qf), 3

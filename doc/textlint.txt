@@ -1,6 +1,6 @@
 *textlint*	Wrapper for textlint.
 
-Version: 1.1.0
+Version: 1.2.0
 Author: Shinya Ohynagi <sohyanagi@gmail.com>
 Repository: http://github.com/heavenshell/vim-textlint/
 License: BSD, see LICENSE for more details.
@@ -76,6 +76,10 @@ After run `:Textlint` textlint.vim would show errors if error exists.
   autocmd TextChanged,TextChangedI *.md call textlint#run()
 >
 You can select textlint config file via command line.
+
+Autofix:
+
+If rules are fixable, you can autofix with `TextintFix`.
 >
 Helpful plugins
 `QuickFixstatus` shows error message at the bottom of the screen.
@@ -108,8 +112,16 @@ g:textlint_clear_quickfix			*g:textlint_clear_quickfix*
 
 		Default value is 1(Clear QuickFix)
 
+g:texlint_bin					*g:textlint_bin*
+		Path to grobal textlint binary.
+
+		Default value is ''(Nothing set)
+
 ==============================================================================
 CHANGELOG					*textlint-vim-changelog*
+2019-4-30
+- Add TextlintFix
+
 2017-05-18
 - Add tests
 

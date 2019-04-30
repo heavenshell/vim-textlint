@@ -1,6 +1,6 @@
 " File: textlint.vim
 " Author: Shinya Ohyanagi <sohyanagi@gmail.com>
-" Version: 1.1.0
+" Version: 1.2.0
 " WebPage: http://github.com/heavenshell/vim-textlint.
 " Description: Vim plugin for TextLint
 " License: BSD, see LICENSE for more details.
@@ -11,6 +11,9 @@ let g:textlint_configs = get(g:, 'textlint_configs', [])
 let g:textlint_enable_quickfix = get(g:, 'textlint_enable_quickfix', 0)
 let g:textlint_clear_quickfix = get(g:, 'textlint_clear_quickfix', 1)
 let g:textlint_callbacks = get(g:, 'textlint_callbacks', {})
+let g:textlint_bin = get(g:, 'textlint_bin', '')
+
+let s:root_path = ''
 
 " TODO Not implemented. Support --rules.
 if !exists('g:textlint_rules')
@@ -22,15 +25,21 @@ let s:textlint_complete = ['c']
 
 let s:textlint = {}
 
-function! s:detect_textlint_bin(srcpath)
-  let textlint = ''
-  if executable('textlint') == 0
-    let root_path = finddir('node_modules', a:srcpath . ';')
-    if root_path == ''
+function! s:get_root_path(srcpath)
+  if s:root_path == ''
+    let s:root_path = finddir('node_modules', a:srcpath . ';')
+    if s:root_path == ''
       return ''
     endif
-    let root_path = fnamemodify(root_path, ':p')
-    let textlint = exepath(root_path . '.bin/textlint')
+    let s:root_path = fnamemodify(s:root_path, ':p')
+  endif
+  return s:root_path
+endfunction
+
+function! s:detect_textlint_bin(root_path)
+  let textlint = ''
+  if executable('textlint') == 0
+    let textlint = exepath(a:root_path . '.bin/textlint')
   else
     let textlint = exepath('textlint')
   endif
@@ -38,17 +47,17 @@ function! s:detect_textlint_bin(srcpath)
   return textlint
 endfunction
 
-function! s:build_config(srcpath)
-  let root_path = fnamemodify(finddir('node_modules', a:srcpath . ';'), ':p')
+function! s:build_config(root_path, autofix)
   if s:textlint_config == '' && len(g:textlint_configs) > 0
     let s:textlint_config = g:textlint_configs[0]
   endif
 
-  let file = expand('%:p')
+  let file = a:autofix ? '%s' : expand('%:p')
+  let stdin = a:autofix ? '' : '--stdin --stdin-filename'
   if s:textlint_config == ''
-    let config_path = printf(' --stdin --stdin-filename %s --format json ', file)
+    let config_path = printf(' %s %s --format json ', stdin, file)
   else
-    let config_path = printf(' --config=%s%s --stdin --stdin-filename %s --format json ', root_path, s:textlint_config, file)
+    let config_path = printf(' --config=%s%s %s %s --format json ', a:root_path, s:textlint_config, stdin, file)
   endif
 
   return config_path
@@ -56,7 +65,7 @@ endfunction
 
 " Build textlint bin path.
 function! s:build_textlink(binpath, configpath)
-  let cmd = a:binpath . a:configpath . '%'
+  let cmd = a:binpath . a:configpath " . '%'
   return cmd
 endfunction
 
@@ -74,12 +83,15 @@ function! s:parse(msg)
   let file = expand('%:p')
   for k in a:msg
     for m in k['messages']
+      let fixable = has_key(m, 'fix') ? '[Fix]' : ''
+      let text = printf('[TextLint]%s %s (%s)', fixable, m['message'], m['ruleId'])
+
       call add(outputs, {
             \ 'filename': file,
             \ 'lnum': m['line'],
             \ 'col': m['column'],
             \ 'vcol': 0,
-            \ 'text': printf('[TextLint] %s (%s)', m['message'], m['ruleId']),
+            \ 'text': text,
             \ 'type': 'E'
             \})
     endfor
@@ -110,6 +122,17 @@ function! s:callback(ch, msg)
   endtry
 endfunction
 
+function! s:exit_fix_callback(ch, msg, tmpfile)
+  try
+    let view = winsaveview()
+    let lines = readfile(a:tmpfile)
+    silent execute '% delete'
+    call setline(1, lines)
+    call winrestview(view)
+  catch
+  endtry
+endfunction
+
 function! s:exit_callback(ch, msg)
   " No errors.
   if has_key(g:textlint_callbacks, 'after_run')
@@ -134,9 +157,9 @@ function! textlint#complete(lead, cmd, pos)
 endfunction
 
 " Detect textlint bin and config file.
-function! textlint#init()
-  let textlint = s:detect_textlint_bin(expand('%:p'))
-  let config = s:build_config(expand('%:p'))
+function! textlint#init(autofix, root_path)
+  let textlint = g:textlint_bin == '' ? s:detect_textlint_bin(a:root_path) : g:textlint_bin
+  let config = s:build_config(a:root_path, a:autofix)
 
   let s:textlint['bin'] = textlint
   let s:textlint['config'] = config
@@ -144,7 +167,7 @@ function! textlint#init()
   return s:textlint
 endfunction
 
-function! textlint#run(...)
+function! s:get_textlint_cmd(args, autofix) abort
   if has_key(g:textlint_callbacks, 'before_run')
     call g:textlint_callbacks['before_run']()
   endif
@@ -153,30 +176,72 @@ function! textlint#run(...)
     call job_stop(s:job)
   endif
 
+  call s:parse_options(a:args)
+  let s:root_path = s:get_root_path(expand('%:p'))
+  let s:textlint = textlint#init(a:autofix, s:root_path)
+  if s:textlint['bin'] == ''
+    return ''
+  endif
+
+  return s:build_textlink(s:textlint['bin'], s:textlint['config'])
+endfunction
+
+function! s:send(cmd, autofix) abort
+  let bufnum = bufnr('%')
+  let buflines = getbufline(bufnum, 1, '$')
+  if a:autofix == 0
+    let s:job = job_start(a:cmd, {
+          \ 'callback': {c, m -> s:callback(c, m)},
+          \ 'exit_cb': {c, m -> s:exit_callback(c, m)},
+          \ 'in_mode': 'nl',
+          \ })
+    let channel = job_getchannel(s:job)
+    if ch_status(channel) ==# 'open'
+      let input = join(buflines, "\n") . "\n"
+      call ch_sendraw(channel, input)
+      call ch_close_in(channel)
+    endif
+  else
+    let t = tempname()
+    let tmpfile = printf('%s_textlint_%s', t, expand('%:t'))
+    call rename(t, tmpfile)
+    call writefile(buflines, tmpfile)
+    let cmd = printf(a:cmd, tmpfile)
+
+    let s:job = job_start(cmd, {
+          \ 'callback': {c, m -> s:callback(c, m)},
+          \ 'exit_cb': {c, m -> s:exit_fix_callback(c, m, tmpfile)},
+          \ 'in_io': 'file',
+          \ 'in_name': tmpfile,
+          \ })
+  endif
+endfunction
+
+function! textlint#run(...)
   let args = ''
   if len(a:000) > 0
     let args = a:000[0]
   endif
-
-  call s:parse_options(args)
-
-  if s:textlint == {} || args != ''
-    call textlint#init()
-  endif
-  let textlint = s:textlint['bin']
-  if textlint == ''
+  let cmd = s:get_textlint_cmd(args, 0)
+  if cmd == ''
+    echohl Error | echomsg 'textlint not found.' | echohl None
     return
   endif
-  let config = s:textlint['config']
+  call s:send(cmd, 0)
+endfunction
 
-  let file = expand('%:p')
-  let cmd = s:build_textlink(textlint, config)
-  let s:job = job_start(cmd, {
-        \ 'callback': {c, m -> s:callback(c, m)},
-        \ 'exit_cb': {c, m -> s:exit_callback(c, m)},
-        \ 'in_io': 'buffer',
-        \ 'in_name': file,
-        \ })
+function! textlint#fix(...) abort
+  let args = ''
+  if len(a:000) > 0
+    let args = a:000[0]
+  endif
+  let cmd = s:get_textlint_cmd(args, 1)
+  if cmd == ''
+    echohl Error | echomsg 'textlint not found.' | echohl None
+    return
+  endif
+  let cmd = printf('%s --fix', cmd)
+  call s:send(cmd, 1)
 endfunction
 
 let &cpo = s:save_cpo

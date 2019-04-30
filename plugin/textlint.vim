@@ -1,6 +1,6 @@
 " File: textlint.vim
 " Author: Shinya Ohyanagi <sohyanagi@gmail.com>
-" Version: 1.1.0
+" Version: 1.2.0
 " WebPage: http://github.com/heavenshell/vim-textlint.
 " Description: Vim plugin for TextLint
 " License: BSD, see LICENSE for more details.
@@ -22,8 +22,10 @@ if !has('channel') || !has('job')
 endif
 
 command! -nargs=* -complete=customlist,textlint#complete Textlint call textlint#run(<q-args>, <count>, <line1>, <line2>)
+command! -nargs=* -complete=customlist,textlint#complete TextlintFix call textlint#fix(<q-args>, <count>, <line1>, <line2>)
 
 noremap <silent> <buffer> <Plug>(Textlint)  :Textlint <CR>
+noremap <silent> <buffer> <Plug>(TextlintFix)  :TextlintFix <CR>
 
 let b:loaded_textlint = 1
 
