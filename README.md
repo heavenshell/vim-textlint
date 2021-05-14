@@ -43,7 +43,7 @@ You can select `textlint` config file via command line.
 
 ## Autofix
 
-If rules are fixable, you can autofix with `TextintFix`.
+If rules are fixable, you can autofix with `TextlintFix`.
 
 ## Helpful plugins
 
